@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournament</title>
+  <style>
+
+
+  </style>
+</head>
+<body>
+  <div id="canvas-box">
+    <canvas id="canvas">
+    </canvas>
+
+    <input type="number" id="width-input" placeholder="width" data-mode="width" class="input-contents">
+    <input type="number" id="height-input" placeholder="height" data-mode="height" class="input-contents">
+    <button id="create-box-button">ボックスを追加</button>
+  </div>
+
+  <style>
+    #canvas-box{
+      max-width: 100%;
+      width: 600px;
+      height: 600px;
+    }
+
+    @media screen and (max-width: 480px){
+      #canvas-box{
+        max-width: 100%;
+      }
+    }
+  </style>
+  <script>
+    let canvas = document.getElementById("canvas");
+    let canvas_width = canvas.width;
+    let canvas_height = canvas.height;
+    let canvas_box = document.getElementById("canvas-box");
+    let input_contents = document.getElementsByClassName("input-contents");
+    let create_box_button = document.getElementById("create-box-button");
+    let default_width_value = 180;
+    let default_height_value = 50;
+
+
+    let width_value = default_width_value;
+    let height_value = default_height_value;
+
+
+    canvas.width = canvas_box.clientWidth;
+    canvas.height = canvas_box.clientHeight;
+    let dragging;
+
+    const point = {
+      x: null,
+      y: null
+    }
+
+
+    let ctx = canvas.getContext("2d");
+
+    let box_data = [
+    ];
+    let dragging_box_data_histroy = [
+
+    ];
+    let dragging_box_data = {};
+    let tournament_box = [];
+
+    let ShiftPush = false;
+
+    let box_index = 0;
+
+    // boxAdd("test_2", 0, 30, 100, 20);
+    // boxAdd("test_3", 0, 60, 100, 20);
+
+    
+    let init_dragging_box_data;
+
+    // canvas.addEventListener("click", function(e){
+    //   const rect = canvas.getBoundingClientRect();
+
+    //   point.x = e.clientX - rect.left;
+    //   point.y = e.clientY - rect.top;
+      
+    //   let target_data = BoxDataGetById("test_1");
+    //   BoxOnClickCheck(target_data, point);
+    // });
+    
+    const Start = function(){
+      
+    }
+    const Update = function(e){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      box_data.forEach((box_data_one, index) => {
+        ctx.strokeRect(box_data_one.positionX, box_data_one.positionY, box_data_one.width, box_data_one.height);
+      });
+      console.log(ShiftPush);
+      window.requestAnimationFrame(Update);
+    }
+
+    Start();
+    Update();
+    
+    canvas.addEventListener("mousedown", function(e){
+      console.log(box_data);
+      const rect = canvas.getBoundingClientRect();
+      point.x = e.clientX - rect.left;
+      point.y = e.clientY - rect.top;
+
+      for(let i = 0; i < box_data.length; i++){
+        if(BoxOnClickCheck(BoxDataGetById(box_data[i].id), point)){
+          dragging_box_data = BoxDataGetById(box_data[i].id);
+          dragging = true;
+        }    
+      }
+
+
+    });
+    
+    document.onkeydown = function(e){
+      // if(e.shiftKey){
+      //   ShiftPush = true;
+      // }
+      ShiftPush = e.shiftKey;
+    }
+    document.onkeyup = function(e){
+      ShiftPush = false;
+    }
+    canvas.addEventListener("mousemove", function(e){
+      if(dragging){
+        const rect = canvas.getBoundingClientRect();
+        
+        point.x = e.clientX - rect.left;
+        point.y = e.clientY - rect.top;
+        //click---Event
+        // console.log(init_dragging_box_data);
+
+        // ctx.clearRect(dragging_box_data.positionX, dragging_box_data.positionY, dragging_box_data.width, dragging_box_data.height);
+        // boxAdd("test_1", point.x - dragging_box_data.width / 2, point.y - dragging_box_data.height / 2, dragging_box_data.width, dragging_box_data.height);
+
+        if(BoxMaxMinAdmit({currentPositionX: dragging_box_data.positionX,
+            currentPositionY: dragging_box_data.positionY,
+            MaxPositionX: canvas.width, MinPositionX: 0, MaxPositionY: canvas.height, MinPositionY: 0})){
+            
+            dragging_box_data_histroy.push(dragging_box_data);
+            BoxMove(dragging_box_data.id, point.x - dragging_box_data.width / 2, point.y - dragging_box_data.height / 2,
+               dragging_box_data.width, dragging_box_data.height);
+
+            
+        }else{
+          BoxMove(dragging_box_data.id, dragging_box_data_histroy[dragging_box_data_histroy.length - 1].positionX, dragging_box_data_histroy[dragging_box_data_histroy.length - 1].positionY,
+               dragging_box_data.width, dragging_box_data.height);
+        }
+
+      }
+
+
+    });
+
+    canvas.addEventListener("mouseup", function(e){
+
+      const rect = canvas.getBoundingClientRect();
+  
+      point.x = e.clientX - rect.left;
+      point.y = e.clientY - rect.top;
+      dragging = false;
+      dragging_box_data = {};
+    });
+    console.log(input_contents);
+
+    create_box_button.addEventListener("click", function(event){
+      console.log(box_index);
+      boxAdd("box_" + box_index, 0, 0, width_value, height_value);
+    });
+
+    for(let i = 0; i < input_contents.length; i++){
+      if(input_contents[i].dataset.mode == "width"){
+        input_contents[i].value = default_width_value;
+      }else if(input_contents[i].dataset.mode == "height"){
+        input_contents[i].value = default_height_value;
+      }
+      input_contents[i].addEventListener("change", function(event){
+        
+        if(event.currentTarget.dataset.mode == "width"){
+          width_value = event.target.value;
+          // box_data.forEach((box_data_one) => {
+          //   box_data_one.width = event.currentTarget.value;
+          // });
+        }else if(event.currentTarget.dataset.mode == "height"){
+          height_value = event.target.value;
+          // box_data.forEach((box_data_one) => {
+          //   box_data_one.height = event.currentTarget.value;
+          // });
+        }
+
+      });
+    }
+
+
+
+    function BoxMove(boxId, targetMovePositionX, targetMovePositionY, width, height){
+        boxRemove(boxId);
+        boxAdd(boxId, targetMovePositionX, targetMovePositionY, width, height);
+        dragging_box_data = BoxDataGetById(boxId);
+    }
+
+    function BoxMaxMinAdmit({currentPositionX, currentPositionY, MaxPositionX, MaxPositionY, MinPositionX, MinPositionY}){
+      console.log("-----------------------------------------------------");
+      console.log("currentX: " + currentPositionX);
+      console.log("currentY: " + currentPositionY);
+      console.log("MinPositionX: " + MinPositionX);
+      console.log("MinPositionY: " + MinPositionY);
+      console.log("MaxPositionX: " + MaxPositionX);
+      console.log("MaxPositionY: " + MaxPositionY);
+      console.log("-----------------------------------------------------");
+      if(currentPositionX >= MinPositionX && currentPositionX <= MaxPositionX && currentPositionY >= MinPositionY && currentPositionY <= MaxPositionY){
+        console.log("-----------------")
+        return true;
+      }else{
+        return false;
+      }
+    }
+
+    function boxRemove(boxId){
+      box_data.forEach((target, index) => {
+        if(boxId == target.id){
+          box_data.splice(index,1);
+        }
+      });
+    }
+
+    function boxAdd(boxId, positionX, positionY, width, height){
+      box_index += 1;
+      box_data.push({
+        id: boxId,
+        positionX: positionX,
+        positionY: positionY,
+        width: width,
+        height: height
+      });
+    }
+
+    function BoxDataGetById(target_id){
+      let box_data_target = null;
+      box_data.forEach((box_data_one) => {
+        if(box_data_one.id == target_id){
+          box_data_target =  box_data_one;
+        }
+      })
+      return box_data_target
+    }
+
+    function BoxOnClickCheck(box_data, point){
+
+      if((box_data.positionX + box_data.width >= point.x &&
+      box_data.positionX <= point.x &&
+      (box_data.positionY + box_data.height >= point.y)
+      && box_data.positionY <= point.y)){
+        return true;
+      }else{
+        return false;
+      }
+
+    }
+
+  </script>
+</body>
+</html>
