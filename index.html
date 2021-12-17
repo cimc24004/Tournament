@@ -17,6 +17,7 @@
 
     <input type="number" id="width-input" placeholder="width" data-mode="width" class="input-contents">
     <input type="number" id="height-input" placeholder="height" data-mode="height" class="input-contents">
+    <input type="text" id="text-title" placeholder="Title">
     <button id="create-box-button">ボックスを追加</button>
   </div>
 
@@ -77,7 +78,10 @@
 
     
     let init_dragging_box_data;
+    let write_once;
 
+    let text_title_input = document.getElementById("text-title");
+    let text_title_value;
     // canvas.addEventListener("click", function(e){
     //   const rect = canvas.getBoundingClientRect();
 
@@ -89,12 +93,26 @@
     // });
     
     const Start = function(){
-      
+      boxAdd("delete_box_1", canvas.width - 60, 0, 60, 60, "fill", true);
+      boxAdd("garbage_image", canvas.width - 60, 0, 60, 60, "image", true, {image_src: "garbage_box.png"});
+      ctx.fillStyle = "red";
     }
     const Update = function(e){
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       box_data.forEach((box_data_one, index) => {
-        ctx.strokeRect(box_data_one.positionX, box_data_one.positionY, box_data_one.width, box_data_one.height);
+        if(box_data_one.mode == "stroke"){
+          ctx.strokeRect(box_data_one.positionX, box_data_one.positionY, box_data_one.width, box_data_one.height);
+        }else if(box_data_one.mode == "fill"){
+          ctx.fillRect(box_data_one.positionX, box_data_one.positionY, box_data_one.width, box_data_one.height);
+        }else if(box_data_one.mode == "image"){
+          var img = new Image();
+          img.src = box_data_one.image.image_src;
+          img.onload = function(event){
+            ctx.drawImage(img, box_data_one.positionX, box_data_one.positionY,
+            box_data_one.width, box_data_one.height);
+          }
+        }
       });
       console.log(ShiftPush);
       window.requestAnimationFrame(Update);
@@ -104,13 +122,16 @@
     Update();
     
     canvas.addEventListener("mousedown", function(e){
-      console.log(box_data);
       const rect = canvas.getBoundingClientRect();
       point.x = e.clientX - rect.left;
       point.y = e.clientY - rect.top;
 
       for(let i = 0; i < box_data.length; i++){
+        console.log("box_data_mouse_down: " + box_data[i].id);
+        console.log(BoxDataGetById(box_data[i].id));
+
         if(BoxOnClickCheck(BoxDataGetById(box_data[i].id), point)){
+          console.log("Boxを発見！");
           dragging_box_data = BoxDataGetById(box_data[i].id);
           dragging = true;
         }    
@@ -129,6 +150,7 @@
       ShiftPush = false;
     }
     canvas.addEventListener("mousemove", function(e){
+
       if(dragging){
         const rect = canvas.getBoundingClientRect();
         
@@ -165,16 +187,37 @@
   
       point.x = e.clientX - rect.left;
       point.y = e.clientY - rect.top;
+      console.log("doragguanddrop");
+  
+
+      if(BoxOnClickCheck(BoxDataGetById("delete_box_1"), point)){
+        if(!dragging_box_data.fixed){
+          console.log("=---fwaefwafafasfa");
+          console.log(dragging_box_data);
+          boxRemove(dragging_box_data.id);
+        }
+
+      }
+
       dragging = false;
       dragging_box_data = {};
     });
     console.log(input_contents);
-
+    text_title_input.addEventListener("change", function(event){
+      text_title_value = event.target.value;
+    });
     create_box_button.addEventListener("click", function(event){
       console.log(box_index);
       boxAdd("box_" + box_index, 0, 0, width_value, height_value);
+      // box_data.forEach((box_data_one) => {
+        
+      // });
+      debugger;
+      // ctx.font = "50pt Arial";
+      // ctx.fillStyle = "#000";
+      ctx.fillText(text_title_value, BoxDataGetById(`box_${box_index - 1}`).positionX, BoxDataGetById(`box_${box_index - 1}`).positionY);
     });
-
+    
     for(let i = 0; i < input_contents.length; i++){
       if(input_contents[i].dataset.mode == "width"){
         input_contents[i].value = default_width_value;
@@ -184,12 +227,12 @@
       input_contents[i].addEventListener("change", function(event){
         
         if(event.currentTarget.dataset.mode == "width"){
-          width_value = event.target.value;
+          width_value = Number(event.target.value);
           // box_data.forEach((box_data_one) => {
           //   box_data_one.width = event.currentTarget.value;
           // });
         }else if(event.currentTarget.dataset.mode == "height"){
-          height_value = event.target.value;
+          height_value = Number(event.target.value);
           // box_data.forEach((box_data_one) => {
           //   box_data_one.height = event.currentTarget.value;
           // });
@@ -201,8 +244,11 @@
 
 
     function BoxMove(boxId, targetMovePositionX, targetMovePositionY, width, height){
+      if(dragging_box_data.fixed == false){
         boxRemove(boxId);
         boxAdd(boxId, targetMovePositionX, targetMovePositionY, width, height);
+      }
+
         dragging_box_data = BoxDataGetById(boxId);
     }
 
@@ -231,14 +277,17 @@
       });
     }
 
-    function boxAdd(boxId, positionX, positionY, width, height){
+    function boxAdd(boxId, positionX, positionY, width, height, mode = "stroke", fixed = false, image_src = null){
       box_index += 1;
       box_data.push({
         id: boxId,
         positionX: positionX,
         positionY: positionY,
         width: width,
-        height: height
+        height: height,
+        mode: mode,
+        fixed: fixed,
+        image: image_src
       });
     }
 
@@ -251,7 +300,15 @@
       })
       return box_data_target
     }
-
+    function ImageDraw(img_path, positionX, positionY, width, height){
+      var img = new Image();
+      img.src = img_path;
+      img.onload = function(event){
+        ctx.drawImage(img, positionX, positionY, width, height);
+        console.log("描画されろ―――");
+        // debugger;
+      }
+    }
     function BoxOnClickCheck(box_data, point){
 
       if((box_data.positionX + box_data.width >= point.x &&
