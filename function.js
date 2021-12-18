@@ -27,7 +27,7 @@ function ContentsRemove(boxId){
   });
 }
 
-function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = "stroke", fixed = false, image_src = null, fillStyle = null, text = "", children = []){
+function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = "stroke", fixed = false, image_src = null, fillStyle = null, text = "", children = [], font_size = null){
   contents_index += 1;
   contents_data.push({
     id: boxId,
@@ -40,8 +40,8 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     image: image_src,
     fillStyle: fillStyle,
     text: text,
-    font_size: null,
-    children: children
+    font_size: font_size,
+    children: children,
   });
   if(text != ""){
     text_data.push({
@@ -53,6 +53,8 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
 
 }
 
+
+
 function ContentsDataGetById(target_id){
   let contents_data_target = null;
   contents_data.forEach((contents_data_one) => {
@@ -62,7 +64,13 @@ function ContentsDataGetById(target_id){
   })
   return contents_data_target;
 }
-
+function ContentsDataOverWrite(target_id, data){
+  contents_data.forEach((contents_data_one) => {
+    if(contents_data_one.id == target_id){
+      contents_data_one = data;
+    }
+  })
+}
 function TextDataGetById(target_id){
   let text_data_target = null;
   text_data.forEach((text_data_one) => {

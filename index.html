@@ -107,6 +107,9 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       contents_data.forEach((contents_data_one, index) => {
+        if(contents_data_one.children != null && contents_data_one.children.length != 0){
+          ContentsDataOverWrite(contents_data_one.children.id, contents_data_one.children);
+        }
         if(contents_data_one.mode == "stroke"){
           ctx.fillStyle = contents_data_one.fillStyle;
 
@@ -127,7 +130,8 @@
         }else if(contents_data_one.mode == "text"){
           ctx.fillStyle = contents_data_one.fillStyle;
           // ctx.font = contents_data_one.font_size;
-          ctx.font = `bold ${contents_data_one.font_size} Arial`;
+          ctx.font = `bold ${contents_data_one.font_size}pt Arial`;
+          console.log(contents_data_one.font_size);
           ctx.fillText(contents_data_one.text, contents_data_one.positionX, contents_data_one.positionY);
 
         }
@@ -189,9 +193,13 @@
             ContentsMove(dragging_contents_data.id, point.x - dragging_contents_data.width / 2, point.y - dragging_contents_data.height / 2,
                dragging_contents_data.width, dragging_contents_data.height);
             if(dragging_contents_data.children != null){
-              dragging_contents_data.children.positionX = dragging_contents_data.positionX + dragging_contents_data.width / 2 - ContentsDataGetById(dragging_contents_data.children.id).width / 2;
-              dragging_contents_data.children.positionY = dragging_contents_data.positionY + dragging_contents_data.height / 2 - ContentsDataGetById(dragging_contents_data.children.id).height / 2;
-              // dragging_contents_data.children.
+              // dragging_contents_data.children.positionX = dragging_contents_data.positionX + dragging_contents_data.width / 2 - ContentsDataGetById(dragging_contents_data.children.id).width / 2;
+              // dragging_contents_data.children.positionY = dragging_contents_data.positionY + dragging_contents_data.height / 2 - ContentsDataGetById(dragging_contents_data.children.id).height / 2;
+              
+              dragging_contents_data.children.positionX = dragging_contents_data.positionX + dragging_contents_data.width / 2 - dragging_contents_data.children.width  - (dragging_contents_data.children.font_size / 2);
+              dragging_contents_data.children.positionY = dragging_contents_data.positionY + dragging_contents_data.height / 2 - dragging_contents_data.children.height / 2 + (dragging_contents_data.children.font_size / 2);
+  
+            // dragging_contents_data.children.
             } 
         }else{
             ContentsMove(dragging_contents_data.id, dragging_contents_data_histroy[dragging_contents_data_histroy.length - 1].positionX, dragging_contents_data_histroy[dragging_contents_data_histroy.length - 1].positionY,
@@ -236,19 +244,20 @@
     create_box_button.addEventListener("click", function(event){
       //ボックス作成ボタンを押したら
 
-      //ボックス事態
-
+      //ボックス事態の追加
       ContentsAdd("contents_" + contents_index, 0, 0, width_value, height_value);
           
       let target_data = ContentsDataGetById(`contents_${contents_index - 1}`);
-      //ボックスの中のText
+      //ボックスの中のTextの追加。
       ContentsAdd("text_" + contents_index, target_data.positionX + target_data.width / 2, target_data.positionY + target_data.height / 2,
-                  ctx.measureText(text_title_value).width,ctx.measureText(text_title_value).height, "text", true, null, "black", text_title_value, font_size_value);
+                  ctx.measureText(text_title_value).width,ctx.measureText(text_title_value).height, "text", true, null, "black", text_title_value,null, font_size_value);
+      debugger;
       target_data.children = ContentsDataGetById(`text_${contents_index - 1}`);
       
       target_data.children.fixed = true;
-      target_data.children.positionX = target_data.positionX + target_data.width / 2 - target_data.children.width / 2;
-      target_data.children.positionY = target_data.positionY + target_data.height / 2 - target_data.children.height / 2;
+      //初期値設定。
+      target_data.children.positionX = target_data.positionX + target_data.width / 2 - target_data.children.width  - (target_data.children.font_size / 2);
+      target_data.children.positionY = target_data.positionY + target_data.height / 2 - target_data.children.height / 2 + (target_data.children.font_size / 2);
 
       // ctx.fillText("HelloWorld", , );
       // ContentsAdd("text_" + contents_index, 0, 0);
