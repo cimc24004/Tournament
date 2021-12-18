@@ -1,9 +1,15 @@
 function ContentsMove(boxId, targetMovePositionX, targetMovePositionY, width, height){
   if(dragging_contents_data.fixed == false){
     ContentsRemove(boxId);
-    ContentsAdd(boxId, targetMovePositionX, targetMovePositionY, width, height);
+    if(dragging_contents_data.image != null){
+      ContentsAdd(boxId, targetMovePositionX, targetMovePositionY, width, height, dragging_contents_data.mode, dragging_contents_data.fixed, dragging_contents_data.image.image_src, dragging_contents_data.fillStyle, dragging_contents_data.text, dragging_contents_data.children);
+    }else{
+      ContentsAdd(boxId, targetMovePositionX, targetMovePositionY, width, height, dragging_contents_data.mode, dragging_contents_data.fixed, dragging_contents_data.image, dragging_contents_data.fillStyle, dragging_contents_data.text, dragging_contents_data.children);
+    }
   }
+
   dragging_contents_data = ContentsDataGetById(boxId);
+  // debugger;
 }
 
 function ContentsMaxMinAdmit({currentPositionX, currentPositionY, MaxPositionX, MaxPositionY, MinPositionX, MinPositionY}){
@@ -23,7 +29,7 @@ function ContentsRemove(boxId){
   });
 }
 
-function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = "stroke", fixed = false, image_src = null, fillStyle = null, text = ""){
+function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = "stroke", fixed = false, image_src = null, fillStyle = null, text = "", children = []){
   contents_index += 1;
   contents_data.push({
     id: boxId,
@@ -35,8 +41,17 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     fixed: fixed,
     image: image_src,
     fillStyle: fillStyle,
-    text: text
+    text: text,
+    children: children
   });
+  if(text != ""){
+    text_data.push({
+      id: boxId,
+      text: text,
+      measureText: ctx.measureText(text)
+    });
+  }
+
 }
 
 function ContentsDataGetById(target_id){
@@ -47,6 +62,37 @@ function ContentsDataGetById(target_id){
     }
   })
   return contents_data_target
+}
+
+function TextDataGetById(target_id){
+  let text_data_target = null;
+  text_data.forEach((text_data_one) => {
+    if(text_data_one.id == target_id){
+      text_data_target =  contents_data_one;
+    }
+  })
+  return text_data_target
+}
+
+
+function ctxFillText(text, fontSize, textX, textY, fontStyle, fontFamily) {
+  ctx.font = (
+    fontStyle ? fontStyle : 'normal') + ' ' +
+    fontSize + 'px ' +
+    (fontFamily ? fontFamily : 'sans-serif')
+  ctx.fillText(
+    text,
+    textX === 'center' ?
+      (ctxWidth - ctx.measureText(text).width) / 2 :
+      textX === 'right' ?
+        ctxWidth - ctx.measureText(text).width:
+        textX && textX !== 'left' ? textX : 0,
+    textY === 'center' ?
+      (ctxHeight + fontSize / 2) / 2 :
+        textY === 'bottom' ?
+          ctxHeight - fontSize / 4 :
+          textY && textY !== 'top' ? textY : fontSize
+  )
 }
 function ImageDraw(img_path, positionX, positionY, width, height){
   var img = new Image();
