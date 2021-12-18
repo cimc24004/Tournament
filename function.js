@@ -7,9 +7,7 @@ function ContentsMove(boxId, targetMovePositionX, targetMovePositionY, width, he
       ContentsAdd(boxId, targetMovePositionX, targetMovePositionY, width, height, dragging_contents_data.mode, dragging_contents_data.fixed, dragging_contents_data.image, dragging_contents_data.fillStyle, dragging_contents_data.text, dragging_contents_data.children);
     }
   }
-
   dragging_contents_data = ContentsDataGetById(boxId);
-  // debugger;
 }
 
 function ContentsMaxMinAdmit({currentPositionX, currentPositionY, MaxPositionX, MaxPositionY, MinPositionX, MinPositionY}){
@@ -42,6 +40,7 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     image: image_src,
     fillStyle: fillStyle,
     text: text,
+    font_size: null,
     children: children
   });
   if(text != ""){
@@ -61,7 +60,7 @@ function ContentsDataGetById(target_id){
       contents_data_target =  contents_data_one;
     }
   })
-  return contents_data_target
+  return contents_data_target;
 }
 
 function TextDataGetById(target_id){
@@ -71,7 +70,7 @@ function TextDataGetById(target_id){
       text_data_target =  contents_data_one;
     }
   })
-  return text_data_target
+  return text_data_target;
 }
 
 
