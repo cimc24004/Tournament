@@ -1,0 +1,14 @@
+#right-mouse-click-menu{
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  padding: 20px;
+  z-index: 100000;
+  width: 150px;
+
+  height: 80px;
+}

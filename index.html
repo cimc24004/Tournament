@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
   <title>Tournament</title>
   <script src="function.js"></script>
   <style>
@@ -11,9 +12,9 @@
 
   </style>
 </head>
-<body>
-  <div id="canvas-box">
-    <canvas id="canvas">
+<body >
+  <div id="canvas-box" >
+    <canvas id="canvas" onContextmenu="return false;">
     </canvas>
 
     <input type="number" id="width-input" placeholder="width" data-mode="width" class="input-contents">
@@ -22,6 +23,11 @@
     <input type="text" id="font-size-input" placeholder="font-size">
 
     <button id="create-box-button">ボックスを追加</button>
+    <div id="right-mouse-click-menu" onContextmenu="return false;">
+      <button id="ArrowCreateButton">
+        矢印を追加
+      </button>
+    </div>
   </div>
 
   <style>
@@ -44,6 +50,7 @@
     let canvas_box = document.getElementById("canvas-box");
     let input_contents = document.getElementsByClassName("input-contents");
     let create_box_button = document.getElementById("create-box-button");
+    let arrow_create_button = document.getElementById("ArrowCreateButton");
     let default_width_value = 180;
     let default_height_value = 50;
 
@@ -88,7 +95,8 @@
     let font_size_input = document.getElementById("font-size-input");
     let font_size_value;
     let text_data = [];
-
+    let right_mouse_click_menu = document.getElementById("right-mouse-click-menu");
+    let context_menu_on_contents_data_id = "";
     // canvas.addEventListener("click", function(e){
     //   const rect = canvas.getBoundingClientRect();
 
@@ -98,7 +106,7 @@
     //   let target_data = BoxDataGetById("test_1");
     //   BoxOnClickCheck(target_data, point);
     // });
-    
+
     const Start = function(){
       ContentsAdd("delete_box_1", canvas.width - 60, 0, 60, 60, "fill", true, null, "red");
 
@@ -138,7 +146,6 @@
       });
 
       
-      
       // ctx.font='bold 50pt Arial';
 
       // ctx.fillStyle = "black";
@@ -153,17 +160,20 @@
     Update();
     
     canvas.addEventListener("mousedown", function(e){
-      const rect = canvas.getBoundingClientRect();
-      point.x = e.clientX - rect.left;
-      point.y = e.clientY - rect.top;
+      if(e.button == 0){
+        const rect = canvas.getBoundingClientRect();
+        point.x = e.clientX - rect.left;
+        point.y = e.clientY - rect.top;
 
-      for(let i = 0; i < contents_data.length; i++){
+        for(let i = 0; i < contents_data.length; i++){
 
-        if(ContentsOnClickCheck(ContentsDataGetById(contents_data[i].id), point)){
-          dragging_contents_data = ContentsDataGetById(contents_data[i].id);
-          dragging = true;
-        }    
-      }
+          if(ContentsOnClickCheck(ContentsDataGetById(contents_data[i].id), point)){
+            dragging_contents_data = ContentsDataGetById(contents_data[i].id);
+            dragging = true;
+          }    
+        }
+
+      }  
 
 
     });
@@ -238,9 +248,11 @@
     text_title_input.addEventListener("change", function(event){
       text_title_value = event.target.value;
     });
+
     font_size_input.addEventListener("change", function(event){
       font_size_value = event.target.value;
     });
+
     create_box_button.addEventListener("click", function(event){
       //ボックス作成ボタンを押したら
 
@@ -262,7 +274,12 @@
       // ctx.fillText("HelloWorld", , );
       // ContentsAdd("text_" + contents_index, 0, 0);
     });
-    
+
+    arrow_create_button.addEventListener("click", function(event){
+      console.log("arrowClick!")
+      console.log(ContentsDataGetById(context_menu_on_contents_data_id));
+    });
+
     for(let i = 0; i < input_contents.length; i++){
       if(input_contents[i].dataset.mode == "width"){
         input_contents[i].value = default_width_value;
@@ -282,9 +299,37 @@
           //   contents_data_one.height = event.currentTarget.value;
           // });
         }
-
       });
     }
+
+
+
+    canvas.addEventListener("contextmenu", function(e){
+      console.log(e.pageX + " or " + e.clientX);
+
+      contents_data.forEach((content_data, index) => {
+        let get_content = ContentsOnClickCheck(content_data, null, e.clientX, e.clientY);
+        if(get_content){
+          ContextMenuManager("show", e, content_data);
+        }
+      });
+
+    });
+    canvas.addEventListener("click", function(e){
+      right_mouse_click_menu.style.display = "none";
+    });
+    function ContextMenuManager(mode, e, content_data){
+      if(mode=="show"){
+        right_mouse_click_menu.style.display = "block";
+        right_mouse_click_menu.style.top = e.clientY + "px";
+        right_mouse_click_menu.style.left = e.clientX + "px";
+        context_menu_on_contents_data_id = content_data.id;
+      }else if(mode == "hide"){
+        right_mouse_click_menu.style.display = "none";
+        
+      }
+    }
+
   </script>
 </body>
 </html>

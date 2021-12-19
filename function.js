@@ -110,15 +110,26 @@ function ImageDraw(img_path, positionX, positionY, width, height){
     // debugger;
   }
 }
-function ContentsOnClickCheck(contents_data, point){
-
-  if((contents_data.positionX + contents_data.width >= point.x &&
-  contents_data.positionX <= point.x &&
-  (contents_data.positionY + contents_data.height >= point.y)
-  && contents_data.positionY <= point.y)){
-    return true;
+function ContentsOnClickCheck(contents_data, point = null, x = 0, y = 0){
+  if(point != null){
+    if((contents_data.positionX + contents_data.width >= point.x &&
+      contents_data.positionX <= point.x &&
+      (contents_data.positionY + contents_data.height >= point.y)
+      && contents_data.positionY <= point.y)){
+        return true;
+    }else{
+      return false;
+    }
   }else{
-    return false;
+    if((contents_data.positionX + contents_data.width >= x &&
+      contents_data.positionX <= x &&
+      (contents_data.positionY + contents_data.height >= y)
+      && contents_data.positionY <= y)){
+      return true;
+    }else{
+      return false;
+    }
   }
+
 
 }
