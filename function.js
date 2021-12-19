@@ -43,13 +43,7 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     font_size: font_size,
     children: children,
   });
-  if(text != ""){
-    text_data.push({
-      id: boxId,
-      text: text,
-      measureText: ctx.measureText(text)
-    });
-  }
+
 
 }
 

@@ -68,7 +68,6 @@
       y: null
     }
 
-
     let ctx = canvas.getContext("2d");
 
     let contents_data = [
@@ -77,6 +76,26 @@
 
     ];
     let dragging_contents_data = {};
+    
+    /*
+      arrows_data{
+        start_content{
+          id
+        },
+        target_connect_content{
+          id
+        },
+        
+      }
+    */
+    let arrows_data = {
+
+    }
+    let arrow_now_data = {
+      
+    }
+    let arrow_mode = false;
+
     let tournament_box = [];
 
     let ShiftPush = false;
@@ -94,7 +113,6 @@
     let text_title_value;
     let font_size_input = document.getElementById("font-size-input");
     let font_size_value;
-    let text_data = [];
     let right_mouse_click_menu = document.getElementById("right-mouse-click-menu");
     let context_menu_on_contents_data_id = "";
     // canvas.addEventListener("click", function(e){
@@ -278,6 +296,7 @@
     arrow_create_button.addEventListener("click", function(event){
       console.log("arrowClick!")
       console.log(ContentsDataGetById(context_menu_on_contents_data_id));
+
     });
 
     for(let i = 0; i < input_contents.length; i++){
