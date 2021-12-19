@@ -12,7 +12,7 @@
 
   </style>
 </head>
-<body >
+<body>
   <div id="canvas-box" >
     <canvas id="canvas" onContextmenu="return false;">
     </canvas>
@@ -92,7 +92,9 @@
 
     }
     let arrow_now_data = {
-      
+      contents_origin_id: null,
+      positionX: null,
+      positionY: null
     }
     let arrow_mode = false;
 
@@ -137,32 +139,42 @@
           ContentsDataOverWrite(contents_data_one.children.id, contents_data_one.children);
         }
         if(contents_data_one.mode == "stroke"){
-          ctx.fillStyle = contents_data_one.fillStyle;
+          ctx.strokeStyle = contents_data_one.style;
 
           ctx.strokeRect(contents_data_one.positionX, contents_data_one.positionY, contents_data_one.width, contents_data_one.height);
         }else if(contents_data_one.mode == "fill"){
-          ctx.fillStyle = contents_data_one.fillStyle;
+          ctx.fillStyle = contents_data_one.style;
 
           ctx.fillRect(contents_data_one.positionX, contents_data_one.positionY, contents_data_one.width, contents_data_one.height);
         }else if(contents_data_one.mode == "image"){
           var img = new Image();
           img.src = contents_data_one.image.image_src;
-          ctx.fillStyle = contents_data_one.fillStyle;
+          ctx.fillStyle = contents_data_one.style;
           
           img.onload = function(event){
             ctx.drawImage(img, contents_data_one.positionX, contents_data_one.positionY,
             contents_data_one.width, contents_data_one.height);
           }
         }else if(contents_data_one.mode == "text"){
-          ctx.fillStyle = contents_data_one.fillStyle;
+          ctx.fillStyle = contents_data_one.style;
           // ctx.font = contents_data_one.font_size;
           ctx.font = `bold ${contents_data_one.font_size}pt Arial`;
-          console.log(contents_data_one.font_size);
           ctx.fillText(contents_data_one.text, contents_data_one.positionX, contents_data_one.positionY);
 
         }
       });
+      if(arrow_now_data != null && arrow_mode && arrow_now_data.positionX != null){
+        let init_box = ContentsDataGetById(`${arrow_now_data.contents_origin_id}`);
 
+        ctx.beginPath();
+        // let path = new Path2D(`M ${init_box.positionX + init_box.width} ${init_box.positionY} L ${arrow_now_data.positionX} ${arrow_now_data.positionY}`);
+        ctx.moveTo(init_box.positionX + init_box.width / 2, init_box.positionY + init_box.height / 2);
+        ctx.lineTo(arrow_now_data.positionX, arrow_now_data.positionY);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "pink";
+        ctx.stroke();
+        // ctx.fillRect(init_box.positionX, init_box.positionY, );
+      }
       
       // ctx.font='bold 50pt Arial';
 
@@ -179,19 +191,32 @@
     
     canvas.addEventListener("mousedown", function(e){
       if(e.button == 0){
+        // 左クリックを押したら
         const rect = canvas.getBoundingClientRect();
         point.x = e.clientX - rect.left;
         point.y = e.clientY - rect.top;
 
-        for(let i = 0; i < contents_data.length; i++){
+        contents_data.forEach((contents_data_one) => {
+          if(ContentsOnClickCheck(ContentsDataGetById(contents_data_one.id), point)){
+            if(!dragging){
+              dragging_contents_data = ContentsDataGetById(contents_data_one.id);
+              dragging = true;
+            }
+          }
+          if(arrow_mode){
+            if(ContentsOnClickCheck(ContentsDataGetById(contents_data_one.id), null,arrow_now_data.positionX, arrow_now_data.positionY)){
+              // 矢印がとあるボックスまで伸びてて、そこで左クリックをしたら
+              console.log("矢印がボックス内 && 左クリック---------------");
+              arrow_mode = false;
+            }
+          }
 
-          if(ContentsOnClickCheck(ContentsDataGetById(contents_data[i].id), point)){
-            dragging_contents_data = ContentsDataGetById(contents_data[i].id);
-            dragging = true;
-          }    
-        }
+        });
 
-      }  
+
+        
+
+      }
 
 
     });
@@ -206,12 +231,11 @@
       ShiftPush = false;
     }
     canvas.addEventListener("mousemove", function(e){
-
+      const rect = canvas.getBoundingClientRect();
+      point.x = e.clientX - rect.left;
+      point.y = e.clientY - rect.top;
       if(dragging){
-        const rect = canvas.getBoundingClientRect();
         
-        point.x = e.clientX - rect.left;
-        point.y = e.clientY - rect.top;
         if(ContentsMaxMinAdmit({currentPositionX: dragging_contents_data.positionX,
             currentPositionY: dragging_contents_data.positionY,
             MaxPositionX: canvas.width, MinPositionX: 0, MaxPositionY: canvas.height, MinPositionY: 0})){
@@ -235,6 +259,10 @@
         }
         
 
+      }
+      if(arrow_mode){
+        arrow_now_data.positionX = point.x;
+        arrow_now_data.positionY = point.y;
       }
 
 
@@ -281,7 +309,7 @@
       //ボックスの中のTextの追加。
       ContentsAdd("text_" + contents_index, target_data.positionX + target_data.width / 2, target_data.positionY + target_data.height / 2,
                   ctx.measureText(text_title_value).width,ctx.measureText(text_title_value).height, "text", true, null, "black", text_title_value,null, font_size_value);
-      debugger;
+
       target_data.children = ContentsDataGetById(`text_${contents_index - 1}`);
       
       target_data.children.fixed = true;
@@ -294,9 +322,15 @@
     });
 
     arrow_create_button.addEventListener("click", function(event){
-      console.log("arrowClick!")
+      console.log("arrowCreateClick!")
       console.log(ContentsDataGetById(context_menu_on_contents_data_id));
-
+      arrow_mode = true;
+      arrow_now_data = {
+        contents_origin_id: context_menu_on_contents_data_id,
+        positionX: null,
+        positionY: null
+      }
+      ContextMenuManager("hide");
     });
 
     for(let i = 0; i < input_contents.length; i++){
@@ -335,7 +369,7 @@
 
     });
     canvas.addEventListener("click", function(e){
-      right_mouse_click_menu.style.display = "none";
+
     });
     function ContextMenuManager(mode, e, content_data){
       if(mode=="show"){
@@ -343,6 +377,7 @@
         right_mouse_click_menu.style.top = e.clientY + "px";
         right_mouse_click_menu.style.left = e.clientX + "px";
         context_menu_on_contents_data_id = content_data.id;
+        
       }else if(mode == "hide"){
         right_mouse_click_menu.style.display = "none";
         

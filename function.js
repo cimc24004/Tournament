@@ -27,7 +27,7 @@ function ContentsRemove(boxId){
   });
 }
 
-function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = "stroke", fixed = false, image_src = null, fillStyle = null, text = "", children = [], font_size = null){
+function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = "stroke", fixed = false, image_src = null, style = "#000", text = "", children = [], font_size = null){
   contents_index += 1;
   contents_data.push({
     id: boxId,
@@ -38,7 +38,7 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     mode: mode,
     fixed: fixed,
     image: image_src,
-    fillStyle: fillStyle,
+    style: style,
     text: text,
     font_size: font_size,
     children: children,
