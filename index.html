@@ -163,13 +163,6 @@
 
         }
       });
-      connect_line_data.forEach((connect_line_data_one, index) => {
-        ctx.beginPath();
-        ctx.moveTo(connect_line_data_one.positionX, connect_line_data_one.positionY);
-        ctx.lineTo(connect_line_data_one.MoveToPositionY, connect_line_data_one.MoveToPositionY);
-        ctx.strokeStyle = "black";
-        ctx.stroke();
-      });
       if(arrow_now_data != null && arrow_mode && arrow_now_data.positionX != null){
         let init_box = ContentsDataGetById(`${arrow_now_data.contents_origin_id}`);
 
@@ -215,16 +208,13 @@
               // 矢印がとあるボックスまで伸びてて、そこで左クリックをしたら
               console.log("矢印がボックス内 && 左クリック---------------");
               let start_line = ContentsDataGetById(arrow_now_data.contents_origin_id);
-              ConnectLineAdd(`connect_line_${connect_line_data_index}`, start_line.positionX, start_line.positionY, -5, -5);
-              ConnectLineAdd(`connect_line_${connect_line_data_index}`, start_line.positionX, start_line.positionY, -5, 5);
+              ConnectLineAdd(`connect_line_${connect_line_data_index}`, start_line.positionX, start_line.positionY, -2, 5);
+              ConnectLineAdd(`connect_line_${connect_line_data_index}`, start_line.positionX, start_line.positionY, -2, -5);
               arrow_mode = false;
             }
           }
 
         });
-
-
-        
 
       }
 

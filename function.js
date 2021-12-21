@@ -47,14 +47,15 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
 
 }
 
-function ConnectLineAdd(boxId, positionX, positionY, move_to_positionX, move_to_positionY){
+function ConnectLineAdd(boxId,TargetId, positionX, positionY, target_positionX, target_positionY){
   connect_line_data_index += 1;
   connect_line_data.push({
     id: boxId,
+    TargetId: TargetId,
     positionX: positionX,
     positionY: positionY,
-    MoveToPositionX: move_to_positionX,
-    MoveTOPositionY: move_to_positionY
+    TargetPositionX: target_positionX,
+    TargetPositionY: target_positionY
   });
 }
 
