@@ -22,7 +22,7 @@ function ContentsMaxMinAdmit({currentPositionX, currentPositionY, MaxPositionX, 
 function ContentsRemove(boxId){
   contents_data.forEach((target, index) => {
     if(boxId == target.id){
-      contents_data.splice(index,1);
+      contents_data.splice(index, 1);
     }
   });
 }
@@ -47,6 +47,24 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
 
 }
 
+function ConnectLineAdd(boxId, positionX, positionY, move_to_positionX, move_to_positionY){
+  connect_line_data_index += 1;
+  connect_line_data.push({
+    id: boxId,
+    positionX: positionX,
+    positionY: positionY,
+    MoveToPositionX: move_to_positionX,
+    MoveTOPositionY: move_to_positionY
+  });
+}
+
+function ConnectLineRemove(boxId){
+  connect_line_data.forEach((connect_line_one, index) => {
+    if(connect_line_one.id == boxId){
+      connect_line_one.splice(index, 1);
+    }
+  });
+}
 
 
 function ContentsDataGetById(target_id){
@@ -58,6 +76,17 @@ function ContentsDataGetById(target_id){
   })
   return contents_data_target;
 }
+
+function ConnectLineDataGetById(target_id){
+  let connect_line_data_target = null;
+  connect_line_data.forEach((connect_line_data_one) => {
+    if(connect_line_data_one.id == target_id){
+      connect_line_data_target =  connect_line_data_one;
+    }
+  })
+  return connect_line_data_target;
+}
+
 function ContentsDataOverWrite(target_id, data){
   contents_data.forEach((contents_data_one) => {
     if(contents_data_one.id == target_id){

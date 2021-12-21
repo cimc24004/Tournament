@@ -53,7 +53,7 @@
     let arrow_create_button = document.getElementById("ArrowCreateButton");
     let default_width_value = 180;
     let default_height_value = 50;
-
+    let connect_line_data_index = 0;
 
     let width_value = default_width_value;
     let height_value = default_height_value;
@@ -103,7 +103,7 @@
     let ShiftPush = false;
 
     let contents_index = 0;
-
+    let connect_line_data = [];
     // ("test_2", 0, 30, 100, 20);
     // boxAdd("test_3", 0, 60, 100, 20);
 
@@ -163,6 +163,13 @@
 
         }
       });
+      connect_line_data.forEach((connect_line_data_one, index) => {
+        ctx.beginPath();
+        ctx.moveTo(connect_line_data_one.positionX, connect_line_data_one.positionY);
+        ctx.lineTo(connect_line_data_one.MoveToPositionY, connect_line_data_one.MoveToPositionY);
+        ctx.strokeStyle = "black";
+        ctx.stroke();
+      });
       if(arrow_now_data != null && arrow_mode && arrow_now_data.positionX != null){
         let init_box = ContentsDataGetById(`${arrow_now_data.contents_origin_id}`);
 
@@ -170,7 +177,7 @@
         // let path = new Path2D(`M ${init_box.positionX + init_box.width} ${init_box.positionY} L ${arrow_now_data.positionX} ${arrow_now_data.positionY}`);
         ctx.moveTo(init_box.positionX + init_box.width / 2, init_box.positionY + init_box.height / 2);
         ctx.lineTo(arrow_now_data.positionX, arrow_now_data.positionY);
-        ctx.lineWidth = 5;
+        // ctx.lineWidth = 5;
         ctx.strokeStyle = "pink";
         ctx.stroke();
         // ctx.fillRect(init_box.positionX, init_box.positionY, );
@@ -207,6 +214,9 @@
             if(ContentsOnClickCheck(ContentsDataGetById(contents_data_one.id), null,arrow_now_data.positionX, arrow_now_data.positionY)){
               // 矢印がとあるボックスまで伸びてて、そこで左クリックをしたら
               console.log("矢印がボックス内 && 左クリック---------------");
+              let start_line = ContentsDataGetById(arrow_now_data.contents_origin_id);
+              ConnectLineAdd(`connect_line_${connect_line_data_index}`, start_line.positionX, start_line.positionY, -5, -5);
+              ConnectLineAdd(`connect_line_${connect_line_data_index}`, start_line.positionX, start_line.positionY, -5, 5);
               arrow_mode = false;
             }
           }
@@ -330,6 +340,7 @@
         positionX: null,
         positionY: null
       }
+
       ContextMenuManager("hide");
     });
 
