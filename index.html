@@ -95,7 +95,11 @@
     let contents_index = 0;
     // ("test_2", 0, 30, 100, 20);
     // boxAdd("test_3", 0, 60, 100, 20);
-
+    let connect_cursor_data = {
+      color: null,
+      directon: null,
+      target_id: null
+    }
     
     let init_dragging_contents_data;
     let write_once;
@@ -106,6 +110,11 @@
     let font_size_value;
     let right_mouse_click_menu = document.getElementById("right-mouse-click-menu");
     let context_menu_on_contents_data_id = "";
+    let cursor_border_x_start;
+    let cursor_border_y_start;
+    let cursor_border_x_end;
+    let cursor_border_y_end;
+
     // canvas.addEventListener("click", function(e){
     //   const rect = canvas.getBoundingClientRect();
 
@@ -124,6 +133,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       contents_data.forEach((contents_data_one, index) => {
+
         if(contents_data_one.children != null && contents_data_one.children.length != 0){
           ContentsDataOverWrite(contents_data_one.children.id, contents_data_one.children);
         }
@@ -151,6 +161,30 @@
           ctx.fillText(contents_data_one.text, contents_data_one.positionX, contents_data_one.positionY);
 
         }
+        if(connect_cursor_data != null && arrow_position_select_mode){
+          console.log(connect_cursor_data);
+          if(connect_cursor_data.target_id == contents_data_one.id){
+            let border_data = contents_data_one.border_data;
+            console.log(connect_cursor_data.direction);
+            ctx.beginPath();
+            if(connect_cursor_data.direction == "width_up"){
+              ctx.moveTo(border_data.width_up.x_start, border_data.width_up.y_start);
+              ctx.lineTo(border_data.width_up.x_end, border_data.width_up.y_start);
+            }else if(connect_cursor_data.direction == "width_down"){
+              ctx.moveTo(border_data.width_down.x_start, border_data.width_down.y_start);
+              ctx.lineTo(border_data.width_down.x_end, border_data.width_down.y_start);
+            }else if(connect_cursor_data.direction == "height_right"){
+              ctx.moveTo(border_data.height_right.x_start, border_data.height_right.y_start);
+              ctx.lineTo(border_data.height_right.x_start, border_data.height_right.y_end);
+            }else if(connect_cursor_data.direction == "height_left"){
+              ctx.moveTo(border_data.height_left.x_start, border_data.height_left.y_start);
+              ctx.lineTo(border_data.height_left.x_start, border_data.height_left.y_end);
+            }
+
+            ctx.strokeStyle = connect_cursor_data.color;
+            ctx.stroke();
+          }
+        }
       });
 
       connect_line_data.forEach((connect_line_data_one, index) => {
@@ -176,13 +210,13 @@
       });
 
       if(arrow_now_data != null && arrow_mode && arrow_now_data.positionX != null){
+        //やじるし　描画
+
         let init_box = ContentsDataGetById(`${arrow_now_data.contents_origin_id}`);
 
         ctx.beginPath();
-        // let path = new Path2D(`M ${init_box.positionX + init_box.width} ${init_box.positionY} L ${arrow_now_data.positionX} ${arrow_now_data.positionY}`);
-        ctx.moveTo(init_box.positionX + init_box.width / 2, init_box.positionY + init_box.height / 2);
+        ctx.moveTo(arrow_now_data.start_positionX, arrow_now_data.start_positionY);
         ctx.lineTo(arrow_now_data.positionX, arrow_now_data.positionY);
-        // ctx.lineWidth = 5;
         ctx.strokeStyle = "pink";
         ctx.stroke();
         // ctx.fillRect(init_box.positionX, init_box.positionY, );
@@ -212,16 +246,20 @@
             let connect_line_data_result = ArrowStartDurationInBoxClickCheck(contents_data_one, point);
             console.log(connect_line_data_result.direction);
             console.log(connect_line_data_result.data_get);
-            arrow_position_select_mode = false;
+            
+            //ピンクヤジルシ追加―
+            let border_data_get_by_direction = BorderDataOfContentsGetByDirectionName(contents_data_one, connect_cursor_data.direction);
             arrow_mode = true;
             arrow_now_data = {
               contents_origin_id: context_menu_on_contents_data_id,
               positionX: null,
               positionY: null,
-              start_positionX: null,
-              start_positionY: null
+              start_positionX: border_data_get_by_direction.x_start,
+              start_positionY: border_data_get_by_direction.y_start
             }
 
+            connect_cursor_data = {};
+            arrow_position_select_mode = false;
           }
         }
       });
@@ -303,6 +341,22 @@
         }
         
 
+      }
+      if(arrow_position_select_mode){
+        contents_data.forEach((contents_data_one) => {
+          if(ContentsOnClickCheck(contents_data_one, point)){
+            let result = ArrowStartDurationInBoxClickCheck(contents_data_one, point);
+            connect_cursor_data = {
+              color: "orange",
+              direction: result.direction,
+              target_id: contents_data_one.id
+            }
+          }else{
+            connect_cursor_data = {
+              
+            }
+          }
+        });
       }
       if(arrow_mode){
         arrow_now_data.positionX = point.x;

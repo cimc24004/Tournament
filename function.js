@@ -41,10 +41,49 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     style: style,
     text: text,
     font_size: font_size,
-    children: children
+    children: children,
+    border_data: {
+      width_up: {
+        x_end: positionX + width,
+        y_end: positionY,
+        x_start: positionX,
+        y_start: positionY
+      },
+      width_down: {
+        x_end: positionX + width,
+        y_end: positionY + height,
+        x_start: positionX,
+        y_start: positionY + height
+      },
+      height_right: {
+        x_end: positionX + width,
+        y_end: positionY + height,
+        x_start: positionX + width,
+        y_start: positionY
+      },
+      height_left: {
+        x_end: positionX,
+        y_end: positionY + height,
+        x_start: positionX,
+        y_start: positionY
+      }
+    }
   });
 
 
+}
+function BorderDataOfContentsGetByDirectionName(target_contents, direction_name){
+  if(direction_name == "width_up"){
+    return target_contents.border_data.width_up;
+  }else if(direction_name == "width_down"){
+    return target_contents.border_data.width_down;
+
+  }else if(direction_name == "height_right"){
+    return target_contents.border_data.height_right;
+
+  }else if(direction_name == "height_left"){
+    return target_contents.border_data.height_left;
+  }
 }
 
 function ArrowStartDurationInBoxClickCheck(target_contents_data, point, permit_border_click_range = 10){
@@ -56,12 +95,12 @@ function ArrowStartDurationInBoxClickCheck(target_contents_data, point, permit_b
   let height_left_data = {x_end: target_contents_data.positionX, y_end: target_contents_data.positionY + target_contents_data.height, x_start: target_contents_data.positionX + permit_border_click_range, y_start: target_contents_data.positionY}
   console.log(point);
   if(width_up_data.x_end >= point.x && width_up_data.x_start <= point.x && width_up_data.y_end <= point.y  && width_up_data.y_start >= point.y){
-    return {direction: "up_width", data_get: width_up_data};
+    return {direction: "width_up", data_get: width_up_data};
   }else if(width_down_data.x_end >= point.x && width_down_data.x_start <= point.x && width_down_data.y_end >= point.y && width_down_data.y_start <= point.y){
-      return {direction: "down_width", data_get: width_down_data};
+      return {direction: "width_down", data_get: width_down_data};
   }else if(height_right_data.x_end >= point.x, height_right_data.x_start <= point.x && height_right_data.y_end >= point.y && height_right_data.y_start <= point.y){
       return {direction: "height_right", data_get: height_right_data};
-  }else if(height_left_data.x_end <= point.x, height_left_data.x_start >= point.x && height_left_data.y_end >= point.y && height_left_data.y_start <= point.y){
+  }else if(height_left_data.x_end >= point.x, height_left_data.x_start >= point.x && height_left_data.y_end >= point.y && height_left_data.y_start <= point.y){
       return {direction: "height_left", data_get: height_left_data};
   }
   return {direction: undefined, data_get: null};
