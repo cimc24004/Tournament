@@ -41,21 +41,40 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
     style: style,
     text: text,
     font_size: font_size,
-    children: children,
+    children: children
   });
 
 
 }
 
-function ConnectLineAdd(boxId,TargetId, positionX, positionY, target_positionX, target_positionY){
+function ArrowStartDurationInBoxClickCheck(target_contents_data, point, permit_border_click_range = 10){
+  //x, y
+  let width_up_data = {x_end: target_contents_data.positionX + target_contents_data.width, y_end: target_contents_data.positionY, x_start: target_contents_data.positionX, y_start: target_contents_data.positionY + permit_border_click_range};
+  let width_down_data = {x_end: target_contents_data.positionX + target_contents_data.width, y_end: target_contents_data.positionY + target_contents_data.height, x_start: target_contents_data.positionX, y_start: target_contents_data.positionY + target_contents_data.height - permit_border_click_range};
+  
+  let height_right_data = {x_end: target_contents_data.positionX + target_contents_data.width, y_end: target_contents_data.positionY + target_contents_data.height, x_start: target_contents_data.positionX + target_contents_data.width - permit_border_click_range, y_start: target_contents_data.positionY};
+  let height_left_data = {x_end: target_contents_data.positionX, y_end: target_contents_data.positionY + target_contents_data.height, x_start: target_contents_data.positionX + permit_border_click_range, y_start: target_contents_data.positionY}
+  console.log(point);
+  if(width_up_data.x_end >= point.x && width_up_data.x_start <= point.x && width_up_data.y_end <= point.y  && width_up_data.y_start >= point.y){
+    return {direction: "up_width", data_get: width_up_data};
+  }else if(width_down_data.x_end >= point.x && width_down_data.x_start <= point.x && width_down_data.y_end >= point.y && width_down_data.y_start <= point.y){
+      return {direction: "down_width", data_get: width_down_data};
+  }else if(height_right_data.x_end >= point.x, height_right_data.x_start <= point.x && height_right_data.y_end >= point.y && height_right_data.y_start <= point.y){
+      return {direction: "height_right", data_get: height_right_data};
+  }else if(height_left_data.x_end <= point.x, height_left_data.x_start >= point.x && height_left_data.y_end >= point.y && height_left_data.y_start <= point.y){
+      return {direction: "height_left", data_get: height_left_data};
+  }
+  return {direction: undefined, data_get: null};
+}
+
+function ConnectLineAdd(Id,OriginId, TargetId, mode="box", direction){
   connect_line_data_index += 1;
   connect_line_data.push({
-    id: boxId,
-    TargetId: TargetId,
-    positionX: positionX,
-    positionY: positionY,
-    TargetPositionX: target_positionX,
-    TargetPositionY: target_positionY
+    id: Id,
+    start_id: OriginId,
+    target_id: TargetId,
+    mode: mode,
+    direction: direction
   });
 }
 
