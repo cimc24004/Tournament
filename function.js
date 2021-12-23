@@ -108,6 +108,7 @@ function ArrowStartDurationInBoxClickCheck(target_contents_data, point, permit_b
 
 function ConnectLineAdd(Id,OriginId, TargetId, mode="box", start_direction, target_direction){
   connect_line_data_index += 1;
+  debugger;
   connect_line_data.push({
     id: Id,
     start_id: OriginId,
