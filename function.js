@@ -12,7 +12,6 @@ function ContentsMove(boxId, targetMovePositionX, targetMovePositionY, width, he
 
 function ContentsMaxMinAdmit({currentPositionX, currentPositionY, MaxPositionX, MaxPositionY, MinPositionX, MinPositionY}){
   if(currentPositionX >= MinPositionX && currentPositionX <= MaxPositionX && currentPositionY >= MinPositionY && currentPositionY <= MaxPositionY){
-    console.log("-----------------")
     return true;
   }else{
     return false;
@@ -72,6 +71,19 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
 
 
 }
+function ConnectRelationShipGetByOriginId(id, mode = "origin"){
+  connect_relationship.forEach((connect_relation) => {
+    if(mode == "origin"){
+      if(connect_relation.origin_id == id){
+        return connect_relation;
+      }
+    }else if(mode == "target"){
+      if(connect_relation.target_id == id){
+        return connect_relation;
+      }
+    }
+  });
+}
 function BorderDataOfContentsGetByDirectionName(target_contents, direction_name){
   if(direction_name == "width_up"){
     return target_contents.border_data.width_up;
@@ -93,7 +105,6 @@ function ArrowStartDurationInBoxClickCheck(target_contents_data, point, permit_b
   
   let height_right_data = {x_end: target_contents_data.positionX + target_contents_data.width, y_end: target_contents_data.positionY + target_contents_data.height, x_start: target_contents_data.positionX + target_contents_data.width - permit_border_click_range, y_start: target_contents_data.positionY};
   let height_left_data = {x_end: target_contents_data.positionX, y_end: target_contents_data.positionY + target_contents_data.height, x_start: target_contents_data.positionX + permit_border_click_range, y_start: target_contents_data.positionY}
-  console.log(point);
   if(width_up_data.x_end >= point.x && width_up_data.x_start <= point.x && width_up_data.y_end <= point.y  && width_up_data.y_start >= point.y){
     return {direction: "width_up", data_get: width_up_data};
   }else if(width_down_data.x_end >= point.x && width_down_data.x_start <= point.x && width_down_data.y_end >= point.y && width_down_data.y_start <= point.y){
