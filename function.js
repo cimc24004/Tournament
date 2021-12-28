@@ -116,8 +116,18 @@ function ArrowStartDurationInBoxClickCheck(target_contents_data, point, permit_b
   }
   return {direction: undefined, data_get: null};
 }
-
-function ConnectLineAdd(Id,OriginId, TargetId, mode="box", start_direction, target_direction){
+function NumberDirectionGetByDirectionName(direction_name){
+  if(direction_name == "width_up"){
+    return {x: null, y: -1};
+  }else if(direction_name == "width_down"){
+    return {x: null, y: 1};
+  }else if(direction_name == "height_left"){
+    return {x: -1, y: null};
+  }else if(direction_name == "height_right"){
+    return {x: 1, y: null};
+  }
+}
+function ConnectLineAdd(Id,OriginId, TargetId, mode="box", start_direction, target_direction, direction_x, direction_y){
   connect_line_data_index += 1;
   debugger;
   connect_line_data.push({
@@ -126,7 +136,9 @@ function ConnectLineAdd(Id,OriginId, TargetId, mode="box", start_direction, targ
     target_id: TargetId,
     mode: mode,
     start_direction: start_direction,
-    target_direction: target_direction
+    target_direction: target_direction,
+    direction_x: direction_x,
+    direction_y: direction_y
   });
 }
 
