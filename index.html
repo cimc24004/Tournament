@@ -101,7 +101,14 @@
       directon: null,
       target_id: null
     }
-
+    let tounament_relationship_cursor_data = {
+      center_line: {
+        x: null,
+        y: null,
+        width: null,
+        height: null
+      }
+    }
     let init_dragging_contents_data;
     let write_once;
     let get_content_contextmenu;
@@ -214,7 +221,7 @@
          
          connect_relationship_get.center_line.x = start_contents.positionX + start_contents.width / 2;
          connect_relationship_get.center_line.y = start_contents_direction_get_data.y_start + (100 * connect_line_data_one.direction_y);
-         connect_relationship_get.center_line.width = Math.Abs((start_contents.positionX + start_contents.width / 2) - (target_contents.positionX + target_contents.width / 2));
+         connect_relationship_get.center_line.width = Math.abs((start_contents.positionX + start_contents.width / 2) - (target_contents.positionX + target_contents.width / 2));
          connect_relationship_get.center_line.height = null;
         
          //End
@@ -282,7 +289,7 @@
       point.y = e.clientY - rect.top;
       contents_data.forEach((contents_data_one) => {
         if(arrow_position_select_mode){
-          if(ContentsOnClickCheck(ContentsDataGetById(contents_data_one.id), point)){
+          if(ContentsOnClickCheck(ContentsDataGetById(contents_data_one.id), point) && connect_cursor_data.direction != undefined){
             let connect_line_data_result = ArrowStartDurationInBoxClickCheck(contents_data_one, point);
             //ピンクヤジルシ追加―
             let border_data_get_by_direction = BorderDataOfContentsGetByDirectionName(contents_data_one, connect_cursor_data.direction);
@@ -343,6 +350,7 @@
               arrow_mode = false;
             }
           }
+
         });
 
       }
@@ -373,7 +381,7 @@
             //トーナメント表の線より低くないと移動できるようにする。
             ContentsMove(dragging_contents_data.id, point.x - dragging_contents_data.width / 2, point.y - dragging_contents_data.height / 2,
               dragging_contents_data.width, dragging_contents_data.height);
-
+            
             if(dragging_contents_data.children != null){
               
               dragging_contents_data.children.positionX = dragging_contents_data.positionX + dragging_contents_data.width / 2 - dragging_contents_data.children.width  - (dragging_contents_data.children.font_size / 2);
@@ -389,6 +397,18 @@
         
 
       }
+      connect_relationship.forEach((connect_relation_ship_one) => {
+        console.log(connect_relation_ship_one);
+        if(ConnectRelationShipOnMouse(connect_relation_ship_one.center_line, point)){
+          //トーナメント表同士を繋げてる真ん中の線にカーソルがあたったら
+          console.log("Hitting----------------");
+          tounament_relationship_cursor_data = {
+            color: "orange",
+            target_id: connect_relation_ship_one.id
+          }
+        }
+      });
+
       //CursorMove
       if(arrow_position_select_mode){
         contents_data.forEach((contents_data_one) => {

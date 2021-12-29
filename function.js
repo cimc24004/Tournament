@@ -71,6 +71,27 @@ function ContentsAdd(boxId, positionX, positionY, width = 0, height = 0, mode = 
 
 
 }
+function ConnectRelationShipOnMouse(connect_relation_data, point, x = null, y = null){
+  if(point != null){
+    if((connect_relation_data.x + connect_relation_data.width - 1 >= point.x &&
+      connect_relation_data.x + 1 <= point.x &&
+      (connect_relation_data.y + connect_relation_data.height - 1 >= point.y)
+      && connect_relation_data.y + 1 <= point.y)){
+        return true;
+    }else{
+      return false;
+    }
+  }else{
+    if((connect_relation_data.x + connect_relation_data.width >= x &&
+      connect_relation_data.x <= x &&
+      (connect_relation_data.y + connect_relation_data.height >= y)
+      && connect_relation_data.y <= y)){
+      return true;
+    }else{
+      return false;
+    }
+  }
+}
 function ConnectRelationShipGetByOriginId(id, mode = "origin"){
   connect_relationship.forEach((connect_relation) => {
     if(mode == "origin"){
